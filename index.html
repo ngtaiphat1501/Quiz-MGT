@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Management Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #faf6ef;
+  --warm: #f0e8d8;
+  --brown: #3d2b1f;
+  --rust: #c4522a;
+  --gold: #d4a833;
+  --sage: #6b8c6e;
+  --ink: #1a1208;
+  --mist: #e8dfd0;
+  --paper: #f5f0e8;
+  --shadow: rgba(61,43,31,0.12);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--cream);
+  color: var(--brown);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.5;
+}
+
+.page { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; position: relative; }
+
+/* Decorative line */
+.deco-line {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brown) 20%, var(--gold) 50%, var(--brown) 80%, transparent);
+  opacity: 0.3;
+  margin: 24px 0;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 48px 0 32px;
+  animation: riseUp 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+.subject-tag {
+  display: inline-block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--rust);
+  border: 1px solid var(--rust);
+  padding: 5px 14px;
+  border-radius: 2px;
+  margin-bottom: 20px;
+  opacity: 0.85;
+}
+
+.header h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.6rem, 7vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.header h1 em {
+  font-style: italic;
+  color: var(--rust);
+}
+
+.header-sub {
+  font-size: 13px;
+  color: var(--brown);
+  opacity: 0.6;
+  letter-spacing: 0.5px;
+}
+
+/* Welcome */
+.welcome { animation: riseUp 0.7s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+.welcome.hide { display: none; }
+
+.bank-info {
+  display: inline-block;
+  background: var(--warm);
+  border: 1px solid var(--mist);
+  padding: 8px 20px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--brown);
+  margin-bottom: 32px;
+  opacity: 0.8;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+@media(max-width:560px) { .mode-grid { grid-template-columns: repeat(3,1fr); } }
+
+.mode-card {
+  background: var(--paper);
+  border: 1.5px solid var(--mist);
+  border-radius: 12px;
+  padding: 18px 10px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.mode-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--rust);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.mode-card:hover::before, .mode-card.active::before { opacity: 0.06; }
+.mode-card.active { border-color: var(--rust); box-shadow: 0 0 0 2px rgba(196,82,42,0.15); }
+
+.mode-card .mc-icon { font-size: 24px; margin-bottom: 6px; display: block; position: relative; }
+.mode-card .mc-name { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; margin-bottom: 2px; position: relative; }
+.mode-card .mc-desc { font-size: 10px; color: var(--brown); opacity: 0.5; letter-spacing: 1px; text-transform: uppercase; position: relative; }
+
+.start-btn {
+  background: var(--rust);
+  color: #fff;
+  border: none;
+  padding: 16px 56px;
+  border-radius: 100px;
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 20px rgba(196,82,42,0.3);
+}
+
+.start-btn:hover {
+  background: #b04824;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(196,82,42,0.35);
+}
+
+/* Stats */
+.stats-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.stat-chip {
+  background: var(--paper);
+  border: 1px solid var(--mist);
+  border-radius: 10px;
+  padding: 10px 16px;
+  flex: 1;
+  text-align: center;
+  min-width: 65px;
+}
+
+.stat-chip .sv {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--brown);
+  margin-bottom: 2px;
+}
+
+.stat-chip.ok .sv { color: var(--sage); }
+.stat-chip.bad .sv { color: var(--rust); }
+.stat-chip .sl { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.5; }
+
+/* Progress */
+.progress-wrap { margin-bottom: 28px; }
+.progress-top { display: flex; justify-content: space-between; font-size: 11px; opacity: 0.5; margin-bottom: 8px; letter-spacing: 0.5px; }
+.progress-track { height: 3px; background: var(--mist); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--rust), var(--gold)); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); border-radius: 2px; }
+
+/* Question Card */
+.q-card {
+  background: var(--paper);
+  border: 1px solid var(--mist);
+  border-radius: 20px;
+  padding: 40px 36px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 20px var(--shadow), 0 0 0 1px rgba(255,255,255,0.7) inset;
+  animation: cardIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+  position: relative;
+}
+
+.q-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 32px; right: 32px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.4;
+}
+
+.q-num {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--rust);
+  opacity: 0.8;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.q-text {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--ink);
+  margin-bottom: 28px;
+  white-space: pre-wrap;
+}
+
+.multi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 16px;
+  opacity: 0.85;
+}
+
+/* Options */
+.options { display: flex; flex-direction: column; gap: 10px; }
+
+.opt-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--cream);
+  border: 1.5px solid var(--mist);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: left;
+  color: var(--brown);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.55;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.opt-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--rust);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.opt-btn:hover:not(:disabled)::before { opacity: 0.04; }
+.opt-btn:hover:not(:disabled) { border-color: rgba(196,82,42,0.35); transform: translateX(3px); }
+
+.opt-btn.selected { border-color: var(--rust); background: rgba(196,82,42,0.04); }
+.opt-btn.correct { border-color: var(--sage); background: rgba(107,140,110,0.07); }
+.opt-btn.wrong { border-color: var(--rust); background: rgba(196,82,42,0.06); }
+.opt-btn.show-correct { border-color: var(--sage); background: rgba(107,140,110,0.04); }
+
+.opt-letter {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; min-width: 28px;
+  border-radius: 8px;
+  background: var(--mist);
+  font-family: 'Fraunces', serif;
+  font-size: 13px;
+  font-weight: 700;
+  transition: all 0.18s;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.opt-btn.selected .opt-letter { background: var(--rust); color: #fff; }
+.opt-btn.correct .opt-letter { background: var(--sage); color: #fff; }
+.opt-btn.wrong .opt-letter { background: var(--rust); color: #fff; }
+.opt-btn.show-correct .opt-letter { background: var(--sage); color: #fff; }
+
+.opt-text { flex: 1; position: relative; }
+.opt-icon { margin-left: auto; font-size: 16px; min-width: 20px; text-align: right; position: relative; }
+
+/* Explanation */
+.expl {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: rgba(212,168,51,0.07);
+  border-left: 2px solid var(--gold);
+  border-radius: 0 10px 10px 0;
+  font-size: 12.5px;
+  color: var(--brown);
+  line-height: 1.7;
+  opacity: 0.8;
+  display: none;
+}
+
+.expl.show { display: block; animation: fadeIn 0.3s ease; }
+
+/* Controls */
+.controls { display: flex; gap: 10px; margin-top: 20px; }
+
+.btn {
+  padding: 13px 24px;
+  border-radius: 100px;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.2px;
+}
+
+.btn-primary {
+  background: var(--rust);
+  color: #fff;
+  flex: 1;
+  box-shadow: 0 3px 12px rgba(196,82,42,0.25);
+}
+
+.btn-primary:hover { background: #b04824; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-secondary {
+  background: var(--paper);
+  color: var(--brown);
+  border: 1.5px solid var(--mist);
+}
+
+.btn-secondary:hover { border-color: var(--rust); color: var(--rust); }
+
+/* Result */
+.result { text-align: center; display: none; }
+.result.show { display: block; animation: riseUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+
+.result-badge {
+  display: inline-block;
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: var(--warm);
+  border: 3px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px;
+  margin: 0 auto 20px;
+  animation: popIn 0.5s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+  box-shadow: 0 4px 20px rgba(212,168,51,0.2);
+}
+
+.result-score {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(3.5rem, 10vw, 6rem);
+  font-weight: 900;
+  color: var(--rust);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.result-sub {
+  font-size: 14px;
+  opacity: 0.6;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.rank-tag {
+  display: inline-block;
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 8px 28px;
+  border-radius: 100px;
+  margin-bottom: 36px;
+  letter-spacing: 0.5px;
+}
+
+.result-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 36px; }
+
+.res-item {
+  background: var(--paper);
+  border: 1px solid var(--mist);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.res-item .rb { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 900; margin-bottom: 4px; }
+.res-item .rs { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.5; }
+.res-item.rc .rb { color: var(--sage); }
+.res-item.rw .rb { color: var(--rust); }
+.res-item.rsk .rb { color: var(--gold); }
+
+.result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* Review */
+.review-hdr {
+  text-align: left;
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 48px 0 20px;
+  color: var(--ink);
+}
+
+.rev-item {
+  background: var(--paper);
+  border: 1px solid var(--mist);
+  border-radius: 14px;
+  padding: 18px 22px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.rev-item.ok { border-left: 3px solid var(--sage); }
+.rev-item.ng { border-left: 3px solid var(--rust); }
+
+.rev-q { font-size: 13px; font-weight: 500; margin-bottom: 8px; line-height: 1.5; display: flex; gap: 8px; color: var(--ink); }
+.rev-n { font-family: 'Fraunces', serif; font-size: 11px; color: var(--rust); white-space: nowrap; margin-top: 1px; font-weight: 700; }
+.rev-ans { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.ans-tag {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.ans-tag.right { background: rgba(107,140,110,0.1); color: var(--sage); }
+.ans-tag.wrong { background: rgba(196,82,42,0.1); color: var(--rust); }
+.ans-tag.correct { background: rgba(107,140,110,0.08); color: var(--sage); border: 1px solid rgba(107,140,110,0.3); }
+
+/* Sound toggle */
+.sound-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 42px; height: 42px;
+  background: var(--paper);
+  border: 1.5px solid var(--mist);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+  z-index: 100;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+.sound-toggle:hover { border-color: var(--rust); transform: scale(1.05); }
+
+/* Ripple effect */
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 0.4; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+.ripple-circle {
+  position: absolute;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--rust);
+  opacity: 0;
+  animation: ripple 0.5s ease-out forwards;
+  pointer-events: none;
+  transform: scale(0);
+}
+
+/* Animations */
+@keyframes riseUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes cardIn { from { opacity:0; transform:translateX(-12px); } to { opacity:1; transform:translateX(0); } }
+@keyframes popIn { from { opacity:0; transform:scale(0.5); } to { opacity:1; transform:scale(1); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+@keyframes bounceRight { 0%{transform:translateX(0)} 50%{transform:translateX(6px)} 100%{transform:translateX(0)} }
+@keyframes correctPulse { 0%{box-shadow:0 2px 20px var(--shadow)} 50%{box-shadow:0 0 0 8px rgba(107,140,110,0.12),0 2px 20px var(--shadow)} 100%{box-shadow:0 2px 20px var(--shadow)} }
+
+.shake { animation: shake 0.4s ease; }
+.bounce { animation: bounceRight 0.35s ease; }
+.correct-pulse { animation: correctPulse 0.5s ease; }
+
+@media(max-width:560px) { .q-card{padding:24px 18px} .controls{flex-direction:column} }
+</style>
+</head>
+<body>
+
+<button class="sound-toggle" id="soundToggle" title="Toggle sound">🔊</button>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="subject-tag">Management Studies</div>
+    <h1>Quiz <em>Time</em></h1>
+    <p class="header-sub">Principles of Management — Ôn tập trắc nghiệm</p>
+  </div>
+
+  <div class="deco-line"></div>
+
+  <!-- Welcome -->
+  <div class="welcome" id="welcome">
+    <div style="text-align:center;margin-bottom:28px">
+      <span class="bank-info" id="bankInfo">📚 Đang tải câu hỏi...</span>
+    </div>
+    <div class="mode-grid" id="modeGrid">
+      <div class="mode-card active" data-n="10"><span class="mc-icon">⚡</span><div class="mc-name">10</div><div class="mc-desc">Quick</div></div>
+      <div class="mode-card" data-n="20"><span class="mc-icon">🎯</span><div class="mc-name">20</div><div class="mc-desc">Standard</div></div>
+      <div class="mode-card" data-n="30"><span class="mc-icon">🔥</span><div class="mc-name">30</div><div class="mc-desc">Hard</div></div>
+      <div class="mode-card" data-n="50"><span class="mc-icon">💪</span><div class="mc-name">50</div><div class="mc-desc">Pro</div></div>
+      <div class="mode-card" data-n="0"><span class="mc-icon">💀</span><div class="mc-name">All</div><div class="mc-desc">Full</div></div>
+    </div>
+    <div style="text-align:center">
+      <button class="start-btn" id="startBtn">Bắt đầu →</button>
+    </div>
+  </div>
+
+  <!-- Quiz -->
+  <div id="quiz" style="display:none">
+    <div class="stats-bar">
+      <div class="stat-chip"><span class="sv" id="sCur">1</span><span class="sl">Câu</span></div>
+      <div class="stat-chip"><span class="sv" id="sTotal">—</span><span class="sl">Tổng</span></div>
+      <div class="stat-chip ok"><span class="sv" id="sOk">0</span><span class="sl">Đúng</span></div>
+      <div class="stat-chip bad"><span class="sv" id="sWr">0</span><span class="sl">Sai</span></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-top"><span id="pLbl">Câu 1</span><span id="pPct">0%</span></div>
+      <div class="progress-track"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+    </div>
+    <div class="q-card" id="qCard">
+      <div class="q-num" id="qNum">QUESTION 01</div>
+      <div class="q-text" id="qText"></div>
+      <div id="mBadge"></div>
+      <div class="options" id="opts"></div>
+      <div class="expl" id="expl"></div>
+    </div>
+    <div class="controls">
+      <button class="btn btn-secondary" id="skipBtn">Bỏ qua</button>
+      <button class="btn btn-primary" id="submitBtn" disabled>Xác nhận ✓</button>
+      <button class="btn btn-primary" id="nextBtn" style="display:none">Tiếp theo →</button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result" id="result">
+    <div class="result-badge" id="rEmoji">🎉</div>
+    <div class="result-score" id="rPct">—</div>
+    <div class="result-sub" id="rSub"></div>
+    <div class="rank-tag" id="rTag"></div>
+    <div class="result-grid">
+      <div class="res-item rc"><div class="rb" id="rOk">0</div><div class="rs">Đúng</div></div>
+      <div class="res-item rw"><div class="rb" id="rWr">0</div><div class="rs">Sai</div></div>
+      <div class="res-item rsk"><div class="rb" id="rSk">0</div><div class="rs">Bỏ qua</div></div>
+    </div>
+    <div class="result-btns">
+      <button class="btn btn-secondary" id="revBtn">📋 Xem lại đáp án</button>
+      <button class="btn btn-primary" id="restartBtn">Làm lại 🔄</button>
+    </div>
+    <div id="revSection" style="display:none">
+      <div class="review-hdr">Chi tiết đáp án</div>
+      <div id="revList"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// =================== SOUND ENGINE ===================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+let soundOn = true;
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  return audioCtx;
+}
+
+function playTone(freq, type, dur, vol = 0.3, delay = 0) {
+  if (!soundOn) return;
+  try {
+    const ctx = getCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+    gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+    gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + delay + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + dur);
+    osc.start(ctx.currentTime + delay);
+    osc.stop(ctx.currentTime + delay + dur + 0.05);
+  } catch(e) {}
+}
+
+function soundClick() {
+  playTone(440, 'sine', 0.08, 0.15);
+}
+
+function soundSelect() {
+  playTone(520, 'sine', 0.1, 0.2);
+  playTone(660, 'sine', 0.08, 0.15, 0.06);
+}
+
+function soundCorrect() {
+  // Happy ascending arpeggio
+  [523, 659, 784, 1047].forEach((f, i) => playTone(f, 'sine', 0.18, 0.25, i * 0.07));
+}
+
+function soundWrong() {
+  // Low descending buzz
+  playTone(300, 'sawtooth', 0.12, 0.2);
+  playTone(220, 'sawtooth', 0.15, 0.18, 0.1);
+}
+
+function soundSkip() {
+  playTone(350, 'triangle', 0.1, 0.15);
+  playTone(280, 'triangle', 0.12, 0.12, 0.08);
+}
+
+function soundSubmit() {
+  playTone(480, 'sine', 0.1, 0.2);
+}
+
+function soundComplete() {
+  // Triumphant fanfare
+  const melody = [523, 659, 784, 659, 784, 1047];
+  melody.forEach((f, i) => playTone(f, 'sine', 0.25, 0.3, i * 0.1));
+}
+
+function soundStart() {
+  [262, 330, 392, 523].forEach((f, i) => playTone(f, 'sine', 0.15, 0.25, i * 0.08));
+}
+
+document.getElementById('soundToggle').addEventListener('click', () => {
+  soundOn = !soundOn;
+  document.getElementById('soundToggle').textContent = soundOn ? '🔊' : '🔇';
+  if (soundOn) soundClick();
+});
+
+// =================== RIPPLE ===================
+function addRipple(btn, e) {
+  const rect = btn.getBoundingClientRect();
+  const x = (e.clientX - rect.left) - 10;
+  const y = (e.clientY - rect.top) - 10;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple-circle';
+  ripple.style.left = x + 'px';
+  ripple.style.top = y + 'px';
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+}
+
+// =================== QUESTIONS ===================
+const Q = [
+// MOTIVATION
+{q:"Cheri and Aaron both wanted to work part time, and they found a lawyer who was willing to split one full-time paralegal job between the two of them so that Cheri works mornings and Aaron works afternoons. This arrangement is known as",o:["A. flextime.","B. participation.","C. job sharing.","D. reinforcement."],a:["C"]},
+{q:"Working a full forty-hour week in fewer than the traditional five days is called",o:["A. job sharing.","B. flextime.","C. a nine-eighty schedule.","D. a compressed work schedule."],a:["D"]},
+{q:"Windmere allows its administrative employees to arrive any time between 7:00 a.m. and 9:00 a.m., and to leave any time between 4:00 p.m. and 6:00 p.m., as long as they work an eight-hour day. This arrangement is known as",o:["A. empowerment.","B. compressed work schedule.","C. a nine-eighty schedule.","D. flextime.","E. traditional schedule."],a:["D"]},
+{q:"When Starbucks implements a policy of not responding to employees who consistently show up late, hoping the behavior will eventually stop, this represents:",o:["A. Punishment","B. Extinction","C. Avoidance","D. Positive reinforcement"],a:["B"]},
+{q:"When a retail store decides to stop giving out free samples to customers who frequently return items, hoping that this will reduce the rate of returns, this represents:",o:["A. Punishment","B. Extinction","C. Avoidance","D. Positive reinforcement"],a:["B"]},
+{q:"John receives a promotion he feels he doesn't deserve, believing his colleague, equally qualified, should have received it instead. According to Equity Theory, how might John feel?",o:["A. Equitably rewarded","B. Under-rewarded","C. Over-rewarded","D. None of the above"],a:["C"]},
+{q:"Jeny feels she is putting in significantly more effort than her colleague, Mark, but they both receive the same bonus. According to Equity Theory, how might Jeny respond?",o:["A. Maintain performance and accept the comparison as fair.","B. Increase her inputs by working even harder.","C. Reduce her inputs by slacking off.","D. All of the answers are possible responses."],a:["D"]},
+{q:"A construction worker consistently exceeds expectations, but receives only standard pay. He feels undervalued and begins to reduce his effort. This scenario aligns with which theory?",o:["A. Expectancy Theory","B. Goal-Setting Theory","C. Equity Theory","D. Porter-Lawler Extension"],a:["C"]},
+{q:"Amelia believes that if she tries hard to eliminate distractions and concentrate on her work, she will learn to do her job more efficiently. Amelia has",o:["A. low effort-to-performance expectancy.","B. moderate performance-to-outcome expectancy.","C. low performance-to-outcome expectancy.","D. high effort-to-performance expectancy."],a:["D"]},
+{q:"A manager expends extra effort because she has been told that she will get a $50,000 bonus if her team meets its quota. She also feels stress because she will be put on probation if her team does not perform above last year's total. Which of the following does this scenario illustrate?",o:["A. Equity theory","B. Maslow's esteem needs","C. Two-factor theory","D. Performance-to-outcome expectancy"],a:["D"]},
+{q:"A manager sets a goal for their team to increase sales by 20% in the next quarter. According to Goal-Setting Theory, what will determine the team's motivation to achieve the goal?",o:["A. The difficulty and specificity of the goal","B. The team's acceptance and commitment to the goal","C. The manager's leadership style and the team's job satisfaction","D. The company's culture and the team's workload"],a:["B"]},
+{q:"A company wants to foster a sense of purpose and personal growth among its employees. Which level of Maslow's hierarchy is the company targeting?",o:["A. Physiological","B. Belongingness","C. Esteem","D. Self-actualization"],a:["D"]},
+{q:"According to Maslow's Hierarchy of Needs, which need must be satisfied before an individual can focus on higher-level needs like esteem and self-actualization?",o:["A. Self-actualization needs","B. Esteem needs","C. Status needs","D. Physiological needs"],a:["D"]},
+{q:"Martha is given a new office and a new job title as recognition for her accomplishment over her years of service. She is satisfied with the recognition and respect from her colleagues. This portrays that the organization is addressing her _____ needs.",o:["A. Security","B. Physiological","C. Belongingness","D. Self-actualization","E. Esteem"],a:["E"]},
+{q:"Which of the following is NOT a characteristic of a need that is at the lower levels of Maslow's Hierarchy?",o:["A. It is essential for survival.","B. It is often difficult to satisfy.","C. It is easily met.","D. It can be a source of motivation."],a:["B"]},
+{q:"Spotify's approach to organizational management, where teams have significant autonomy in decision-making, best exemplifies which motivational strategy?",o:["A. Traditional hierarchical management","B. Empowerment","C. Strict top-down control","D. Performance monitoring"],a:["B"]},
+{q:"Aside from content, process, and reinforcement perspectives, an organization's _____ is its most basic tool for managing employee motivation.",o:["A. strategic plan","B. vision statement","C. objective","D. reward system"],a:["D"]},
+{q:"A manager gives her employees a variable bonus every month based on resulting cost savings every time they exceed their sales quota. This type of incentive pay is known as",o:["A. fixed-rate pay.","B. profit sharing.","C. gainsharing.","D. lump-sum bonus."],a:["C"]},
+{q:"In what common form of executive compensation are senior managers able to buy shares in the company at a predetermined fixed price?",o:["A. Gainsharing plan","B. Stock option plan","C. Profit sharing plan","D. ESOP"],a:["B"]},
+{q:"Which of the following is true about individual incentive plans?",o:["A. They are focused to recognize efforts rather than individual performances.","B. They are used to provide individual performances with nonmonetary rewards.","C. They are most likely to be used when performance can be subjectively assessed.","D. They are used to reward individual performance on a real-time basis."],a:["D"]},
+{q:"In expectancy theory, raises, promotions, stress and resentment are all _____ of an individual's behaviors.",o:["A. Factors","B. Motivations","C. Reinforcements","D. outcomes"],a:["D"]},
+
+// ENVIRONMENT
+{q:"Alex, one of the proprietors of Atlas Corp. is worried. The stock market was not doing well, unemployment was 10 percent, inflation was on the rise again, and government debt was still increasing. These concerns of Alex are related to the ______ dimension of the general environment of Atlas Corp.",o:["A. Economic","B. Sociocultural","C. Technological","D. Political"],a:["A"]},
+{q:"The set of broad dimensions and forces in an organization's surroundings that determines its overall context is called the ______ environment.",o:["A. Task","B. General","C. physical work","D. Regulatory"],a:["B"]},
+{q:"Which of the following is a concern of the technological dimension of an organization's general environment?",o:["A. Organization's policies and practices","B. Inflation, interest rates, and unemployment","C. Tools, methods, and technology","D. Government regulations"],a:["C"]},
+{q:"A business manufactures top-of-the-line cabinets. The ______ dimension of its general environment includes computer-assisted design software that helps to convert wood and people's idea into lovely, functional cabinets.",o:["A. legal","B. sociocultural","C. technological","D. political","E. economic"],a:["C"]},
+{q:"In Asia, consumers have historically had an aversion to debt. However, in recent years credit card use has grown significantly. This example comprises the ______ dimension of an organization's general environment.",o:["A. economic","B. technological","C. sociocultural","D. political-legal"],a:["C"]},
+{q:"Which of the following is an accurate difference between the task environment and the general environment?",o:["A. The general environment is quite complex, whereas the task environment is very simple.","B. The task environment provides useful information more readily than the general environment.","C. The task environment deals with more abstract dimensions than the general environment.","D. The general environment's impact is short term, whereas that of the task environment is long term."],a:["B"]},
+{q:"An example of a force for change in the task environment of an organization is",o:["A. pricing strategies of competitors.","B. employee turnover rates.","C. capital availability.","D. employee motivation."],a:["A"]},
+{q:"Which of the following accurately describes the responsibility of a corporate board of directors?",o:["A. Exerting considerable influence by using the media to call attention to their positions","B. Helping the company get the expertise they lack from other companies","C. Ensuring the firm is run to best serve the stockholders' interests","D. Gaining legal property rights to the business by buying stock","E. Protecting the public from certain business practices or to protect organizations from one another"],a:["C"]},
+{q:"Which of the following actions represents an attempt to manage social responsibility through ethical compliance?",o:["A. Requiring top financial managers to ensure compliance with securities and banking regulations","B. Donating money to fund the performing arts","C. Creating a committee to review policies concerning selection of new hires and promotion of employees","D. Consulting the legal department regarding the requirements of a particular law"],a:["C"]},
+{q:"When organizations relate to their environments in ways that involve ethical dilemmas and decisions, these situations are said to fall within the context of the organization's _____ responsibility.",o:["A. Legal","B. Ethical","C. Social","D. cultural"],a:["B"]},
+{q:"A company would begin to do business in another country only if the trade relationships with that country are relatively well defined and stable. Which dimension of the general environment does this reflect?",o:["A. Task","B. Economic","C. Technological","D. Political-legal"],a:["D"]},
+{q:"Where does an organization's culture originate?",o:["A. Societal norms and expectations","B. Pressure applied through mergers","C. With the organization's founder","D. Resolution of disputes between rival factions","E. Government regulation of the specific industry"],a:["C"]},
+
+// INTERNATIONAL BUSINESS
+{q:"A(n) ______ strategy requires small cash outlay, is heavily regulated by government, and does not require modification to products for local conditions.",o:["A. Importing","B. Licensing","C. joint venture","D. direct investment"],a:["B"]},
+{q:"Once a licensing agreement is agreed to, the licensee pays a(n) _____ in return.",o:["A. Interest","B. Remuneration","C. Royalty","D. Tariff"],a:["C"]},
+{q:"An international ______ is a set of countries that agree to markedly reduce or eliminate trade barriers among member nations.",o:["A. Commonwealth","B. free trade area","C. economic community","D. customs union"],a:["B"]},
+{q:"Which of the following is an agreement among the United States, Canada, and Mexico to promote trade with one another?",o:["A. North American Free Trade Agreement","B. North Atlantic Treaty Organization","C. General Agreement on Tariffs and Trade","D. Transatlantic Free Trade Agreement"],a:["A"]},
+{q:"Myrtle Wines, a chain of wine retailers, has prepared guidelines that clearly specify how employees should interact with suppliers, customers, competitors, and other people associated with their business. The guidelines prepared by Myrtle form its:",o:["A. business plan.","B. strategic plan.","C. code of ethics.","D. licensing agreement."],a:["C"]},
+{q:"Atlanta is a German company that manufactures dishwashers in Germany. Its products are sold in the United States. Which of the following statements is most accurate?",o:["A. Atlanta is exporting its products to the United States.","B. Atlanta has a license agreement with the United States.","C. Atlanta is importing its products from the United States.","D. Atlanta wholly owns subsidiaries of the firm in the United States."],a:["A"]},
+
+// ORGANIZATION DESIGN & STRUCTURE
+{q:"In ______ technology, raw materials are transformed to a finished product by a series of machine transformations in such a way that the composition of the materials themselves is changed.",o:["A. product-customization","B. large-batch","C. mass-production","D. continuous-process"],a:["D"]},
+{q:"Alpha Electronics assembles different parts to make standardized laptops along an assembly line. Alpha Electronics uses ______ technology.",o:["A. job rotation","B. mass-production","C. Unit","D. continuous-process"],a:["B"]},
+{q:"Durban Cafe takes one order at a time and customizes the coffee as per the customer's requirement. The cafe uses ______ technology.",o:["A. small-batch","B. mass-production","C. continuous-process","D. standardized process","E. large-batch"],a:["A"]},
+{q:"A(n) ______ is a management model of organization design based on a legitimate and formal system of authority.",o:["A. advocacy","B. bureaucracy","C. entropy","D. autocracy"],a:["B"]},
+{q:"What is one of the strengths of the bureaucratic model?",o:["A. Favoritism and bias are minimized.","B. It is easier to change rules when circumstances change.","C. Once rules are understood, it is easier to make exceptions.","D. There is a higher level of flexibility.","E. More attention is paid to the human and social processes."],a:["A"]},
+{q:"In ______, the output of one unit becomes the input for another in a serial fashion.",o:["A. pooled interdependence","B. sequential interdependence","C. structural interdependence","D. reciprocal interdependence"],a:["B"]},
+{q:"A retail bank has organized its branches into three primary groups: Personal Banking, Small Business Banking, and Corporate Banking. This is an example of:",o:["A. Functional Departmentalization","B. Product Departmentalization","C. Customer Departmentalization","D. Location Departmentalization"],a:["C"]},
+{q:"The ______ view of organizational design assumes that the optimal design for an organization depends on a set of relevant factors, including technology, environment, size, and organizational life cycle.",o:["A. Optimized","B. Situational","C. Bureaucratic","D. Differentiated"],a:["B"]},
+{q:"The term span of management refers to the",o:["A. extent to which authority is delegated at the individual level.","B. extent to which authority is systematically delegated to middle and lower levels of management.","C. number of people reporting to a particular manager.","D. process of grouping jobs according to some logical pattern.","E. number of managers assigned to a department."],a:["C"]},
+{q:"What reason do researchers give for their findings that there are more communication problems in tall organizations than flat organizations?",o:["A. The smaller number of managers as compared to line workers","B. The fewer number of subordinates reporting to each manager","C. The increased number of people through whom information must pass","D. Reductions in morale tend to prevent employees from communicating effectively"],a:["C"]},
+{q:"______ is defined as a clear and distinct line of authority among the positions in an organization.",o:["A. Chain of command","B. Span of management","C. Job deskilling","D. Flat structure"],a:["A"]},
+
+// JOB DESIGN
+{q:"Jane has been working as a customer service representative at a call center for three years. Her manager decides not only to expand the number of tasks she performs but also to give her more control over how she schedules her calls and resolves customer issues. What alternative to job specialization is Jane's manager using?",o:["A. Job rotation","B. Job enlargement","C. Job enrichment","D. Job simplification"],a:["C"]},
+{q:"Job ______ attempts to increase both the number of tasks a worker does and the control the worker has over the job.",o:["A. Enlargement","B. Rotation","C. Enrichment","D. specialization"],a:["C"]},
+{q:"Job ______ was developed as a limited approach specifically intended to increase the total number of tasks workers perform. As a result, all workers perform a wide variety of tasks, which presumably reduces the level of job dissatisfaction.",o:["A. Enlargement","B. Rotation","C. Enrichment","D. specialization"],a:["A"]},
+{q:"Jimmy owns an ice cream parlor. He designs a schedule for the different tasks the employees have to perform in order to prevent monotony at work. If an employee makes waffle cones on a day, he serves ice creams the next day and clears the tables on the day after that. Jimmy is using the _____ approach at his ice cream parlor.",o:["A. job enrichment","B. job enlargement","C. job rotation","D. job specialization"],a:["C"]},
+{q:"PDC Industries wants to move away from a job specialization approach. For one of its product lines, it has given the group the responsibility to design the work system to be used, including assigning tasks and monitoring and controlling its own performance. What approach is this?",o:["A. Job rotation","B. Work teams","C. Functional departmentalization","D. Job enlargement"],a:["B"]},
+{q:"Pete, a manager, embraces the job characteristics approach. Pete thinks that when his employees have more control over how their work is performed, they do better. Which characteristic is Pete emphasizing?",o:["A. Feedback","B. task identity","C. task significance","D. Autonomy","E. skill variety"],a:["D"]},
+{q:"Which of the following scenarios best exemplifies the core dimension of 'Task Significance' in the Job Characteristics Model?",o:["A. A factory worker who performs the same repetitive task for eight hours a day","B. A software engineer who has complete control over the design and implementation of a new project.","C. A nurse who directly interacts with patients and provides critical care.","D. A telemarketer who follows a strict script and has limited autonomy in their interactions with customers."],a:["C"]},
+{q:"At Delta Corp. the manufacturing and design department frequently consults with the research and development department and the marketing and sales department regularly interacts with the manufacturing and design department. This scenario illustrates ____ at Delta.",o:["A. coordination","B. delegation","C. job rotation","D. job specialization"],a:["A"]},
+
+// OPERATIONS & TECHNOLOGY
+{q:"A manufacturing company aims to enhance production efficiency by adopting automation and computer-assisted manufacturing technologies. What is a primary benefit of implementing computer-integrated manufacturing (CIM)?",o:["A. Increased reliance on paper-based processes","B. Reduced communication among teams","C. Limited flexibility in production schedules","D. Centralized control of manufacturing activities through a computer network integrated with the company's broader information systems"],a:["D"]},
+{q:"Which of the following is true of automation?",o:["A. The development of automation has created jobs across all industries.","B. Automated machines make more errors.","C. Automation discourages innovation.","D. Automation helps to improve products and services."],a:["D"]},
+{q:"______ include robotic work units or workstations, assembly lines, and robotic carts or some other form of computer-controlled transport system to move material as needed from one part of the system to another.",o:["A. Call-center systems","B. Flexible manufacturing systems","C. Computer-aided design technologies","D. Expert systems"],a:["B"]},
+{q:"A clothing manufacturer notices inconsistencies in production quality. They use historical data to identify patterns in errors and adjust machine settings accordingly. Which TQM tool are they using?",o:["A. Six Sigma","B. Statistical process control","C. Benchmarking","D. Value-added analysis"],a:["B"]},
+{q:"Which of the following is a process of subcontracting services and operations to other firms that can perform them cheaper or better?",o:["A. Benchmarking","B. Value-added analysis","C. Outsourcing","D. Statistical quality control"],a:["C"]},
+{q:"A typical responsibility of operations managers includes",o:["A. inventory control.","B. sales promotion.","C. Accounting","D. employee development"],a:["A"]},
+{q:"What is the source of control for finished goods inventory?",o:["A. Shop floor control systems","B. High-level production scheduling systems","C. Transportation","D. Distribution control systems"],a:["D"]},
+{q:"Within operations, managerial control ensures",o:["A. the goal of low product reliability.","B. the goal of high unit production cost.","C. lowest possible cost regardless of quality.","D. that resources and activities achieve primary goals.","E. highest quality regardless of cost."],a:["D"]},
+{q:"encapsulates the conversion processes used to transform inputs (such as materials or information) into outputs (such as products or services).",o:["A. Entropy","B. Technology","C. Synergy","D. Divestiture"],a:["B"]},
+
+// STRATEGY
+{q:"Which of the following strategies will help companies succeed during the growth stage of a product cycle?",o:["A. Focusing on developing new products or services","B. Increasing overhead costs","C. Sacrificing product quality","D. Focusing on creating product differentiation"],a:["D"]},
+{q:"Which of the following strategies can help companies during the maturity stage of a product life cycle?",o:["A. Drastically increasing product prices","B. Manufacturing products in small quantities intermittently than in bulk","C. Focusing on keeping costs low","D. Sacrificing the quality of products","E. Focusing more on strategies to slow the entry of competitors"],a:["C"]},
+{q:"Which of the following strategies can help companies survive during the decline stage of the product life cycle?",o:["A. Increasing production costs","B. Manufacturing the products frequently and in smaller quantities","C. Avoiding differentiation strategies","D. Developing new products or services"],a:["D"]},
+{q:"During the introduction phase of the product life cycle",o:["A. companies must sacrifice product quality.","B. most companies tend to downsize.","C. demand may be very high.","D. competition is at its peak."],a:["C"]},
+{q:"An organization's ______ is a statement of its fundamental, unique purpose that sets a business apart from other firms of its type and identifies the scope of the business's operations in product and market terms.",o:["A. Mission","B. statement of qualification","C. article of incorporation","D. operational goal","E. tactical plan"],a:["A"]},
+{q:"Strategy formulation is the",o:["A. set of decisions an organization makes about how it will distribute its resources.","B. method by which strategies are operationalized or executed.","C. set of processes for determining the strategies that will be used by an organization.","D. process of evaluating an organization's strengths and weaknesses.","E. set of decisions an organization makes to neutralize threats and avoid weaknesses."],a:["C"]},
+{q:"Gadgetbug Inc. is known for its extremely efficient after-purchase service. None of Gadgetbug's competitors provide the same kind of customer service. Gadgetbug's _____ is described in the scenario.",o:["A. Scope","B. divestiture strategy","C. strategic limitation","D. process loss","E. distinctive competence"],a:["E"]},
+{q:"Zing Inc. is a large fashion brand that manufactures clothing and shoes. The top managers of Zing have decided to use the profits from its clothing outlets to invest in the shoes business. This scenario illustrates the ______ component of a strategy.",o:["A. resource deployment","B. scope","C. distinctive competence","D. process loss"],a:["A"]},
+{q:"Strategic plans",o:["A. focus on how to operationalize actions necessary to achieve goals.","B. are concerned more with actually getting things done than with deciding what to do.","C. have a short-term focus and are relatively narrow in scope.","D. typically involve upper and middle management and have a somewhat shorter time horizon.","E. generally have an extended time horizon, and address questions of scope, resource deployment, competitive advantage, and synergy."],a:["E"]},
+{q:"In contrast to strategic plans, tactical plans must",o:["A. specify resources and time frames.","B. be developed independently of the internal business environment.","C. be developed independently of the external business environment.","D. be more general and broadly based."],a:["A"]},
+{q:"Operational goals are concerned with",o:["A. shorter-term issues associated with the tactical goals.","B. longer-term issues associated with the tactical goals.","C. shorter-term issues associated with the strategic plan.","D. longer-term issues associated with the strategic plan.","E. longer-term issues associated with the operational plan."],a:["A"]},
+{q:"Which of the following statements is true about tactical goals?",o:["A. Their focus is on how to operationalize actions necessary to achieve strategic goals.","B. Their focus is on broad and long-term issues such as increasing the profitability of the organization.","C. They are set for and by top managers.","D. They are set for and by the board of directors.","E. They are broad and nonspecific."],a:["A"]},
+{q:"Which of the following statements is true about strategic goals?",o:["A. They are set by an organization's middle managers.","B. They are set by first-line managers.","C. They provide plans for the day-to-day operations of an organization.","D. They focus on broad and general issues.","E. Their focus is on short-term issues."],a:["D"]},
+{q:"In the context of SWOT analysis, which of the following would be considered as an organization's strength?",o:["A. Exiting competitors","B. High overhead costs","C. Favorable government policies","D. Motivated employees"],a:["D"]},
+{q:"A(n) ______ is an internal skill or capability that does not enable a company to choose and implement strategies that support its mission.",o:["A. organizational weakness","B. organizational threat","C. market threat","D. process gain"],a:["A"]},
+{q:"A(n) ______ is an operational plan that is developed to carry out a course of action that is not likely to be repeated in the future.",o:["A. Policy","B. standing plan","C. rule or regulation","D. single-use plan"],a:["D"]},
+{q:"______ Strategy is the set of strategic alternatives from which an organization chooses as it manages its operations simultaneously across several industries and several markets.",o:["A. Corporate-level","B. Business-level","C. Operational-level","D. Divestiture"],a:["A"]},
+{q:"SuperWheels is a large firm that manufactures bicycles. The company sells a line of mountain bikes targeted at experienced off-road bikers. SuperWheels has introduced several innovations to set its bikes off from those of its competitors. Which of the following strategies is illustrated?",o:["A. Overall cost leadership strategy","B. Differentiation strategy","C. Focus strategy with differentiation focus","D. Focus strategy with cost leadership focus","E. Cost leadership strategy with differentiation focus"],a:["C"]},
+{q:"Nutrimax Inc. identifies its purpose as 'to produce the finest cookies in the world while upholding our principles of promoting good health and maintaining environmental sustainability.' This purpose is most likely to be the ______ of Nutrimax.",o:["A. strategic goal","B. distinctive competence","C. mission statement","D. operational goal","E. tactical goal"],a:["C"]},
+{q:"techniques are methods that diversified organizations use to determine in which businesses to engage and how to manage these businesses to maximize corporate performance.",o:["A. Divestiture","B. Process gain","C. Portfolio management","D. Deskilling"],a:["C"]},
+
+// ORGANIZATIONAL CHANGE & INNOVATION
+{q:"According to the Lewin model of organization change process, refreezing involves",o:["A. recognizing why the change is necessary.","B. informing people about the change.","C. the implementation of the change.","D. reinforcing the change so that it becomes a part of the system."],a:["D"]},
+{q:"Which stage of the Lewin model of organization change involves managers letting people who will be affected by an impending change know the reasons for the change?",o:["A. Implementing","B. Recognizing","C. Refreezing","D. Transforming","E. Unfreezing"],a:["E"]},
+{q:"The radical redesign of all aspects of an organization in order to achieve major gains in cost reduction, service delivery, or reduction in order-processing time is known as",o:["A. entropy.","B. process change.","C. innovation.","D. reengineering."],a:["D"]},
+{q:"Amazon introduced its 'one-click ordering' system, simplifying the online purchasing process for customers. What type of innovation does Amazon's 'one-click ordering' primarily represent?",o:["A. Radical Innovation","B. Process Innovation","C. Product Innovation","D. Managerial Innovation"],a:["B"]},
+{q:"An automotive manufacturer develops a new type of hybrid engine that significantly improves fuel efficiency compared to traditional gasoline engines. What type of innovation is this?",o:["A. Managerial Innovation","B. Process Innovation","C. Technical Innovation","D. Incremental Innovation"],a:["C"]},
+{q:"Apple releases a new iPhone every year. While each new model has some new features, the core functionality and design remain largely the same. What type of innovation do Apple's annual iPhone updates primarily represent?",o:["A. Incremental Innovation","B. Radical Innovation","C. Product Innovation","D. Managerial Innovation"],a:["A"]},
+{q:"A company implements a new project management software that streamlines communication and task assignment among its teams, leading to increased efficiency and collaboration. What type of innovation is this?",o:["A. Technical Innovation","B. Process Innovation","C. Product Innovation","D. Managerial Innovation"],a:["B"]},
+{q:"Which of the following is an effective way of overcoming resistance to change?",o:["A. Allowing employees to participate in the change process","B. Fostering an environment of uncertainty in the organization","C. Announcing the change only after it has been implemented","D. Minimizing communication among employees"],a:["A"]},
+{q:"Managers can overcome resistance to change by",o:["A. not letting employees know about the change.","B. letting employees know about the change only after it has been successfully implemented.","C. limiting the involvement of employees in the change process.","D. announcing the change much in advance."],a:["D"]},
+{q:"The normal process within an organization that leads to a system decline is known as",o:["A. reengineering.","B. synergy.","C. process gain.","D. entropy."],a:["D"]},
+{q:"Libra Technologies Inc. frequently asks its employees to measure such things as supervisor effectiveness. The company circulates various questionnaires among all its employees to get their insights. Which organization development is illustrated?",o:["A. Third-party peacemaking","B. Survey feedback","C. Team building","D. Process consultation"],a:["B"]},
+{q:"Sales are down, and Francis knows he needs to make some changes. He is now trying to understand whether the downturn was caused by poor customer service, poor quality product, improper pricing, or some other factor. Which step has Francis reached in the comprehensive approach to change?",o:["A. Recognizing the need for change","B. Implementing the change","C. Setting goals for the change","D. Selecting a change technique","E. Diagnosing relevant variables"],a:["E"]},
+{q:"Ron, a manager at a hardware component manufacturing unit, has recently learned that the production rates in his firm have gone down because of poor employee morale. Ron has realized that he needs to make a change in the organization that will motivate employees. Which of the following steps in the comprehensive approach to change is illustrated?",o:["A. Recognizing the need for change","B. Understanding how to implement the change","C. Setting goals for the change","D. Selecting a change technique"],a:["A"]},
+{q:"A company has set an objective to increase its product sales by 50 percent in the next two years. Identify the step of the organization change process of the company.",o:["A. Recognition of the need for change","B. Establishment of goals for the change","C. Selection of appropriate change technique","D. Planning for implementation of the change"],a:["B"]},
+{q:"A change in reporting relationships within an organization is an example of change in the area of",o:["A. organization structure.","B. organizational operations.","C. work processes.","D. information technology."],a:["A"]},
+{q:"Substantive modification to some part of an organization is known as organization",o:["A. synergy.","B. maturity.","C. implementation.","D. change."],a:["D"]},
+{q:"When Beta Inc. acquired Redd Communications, there was a huge uproar by the staff of Redd Communications as there were rumors of staff reductions and operations closures. ______ was the cause for this reaction.",o:["A. Synergy","B. Process gain","C. Uncertainty","D. Process loss"],a:["C"]},
+
+// LEADERSHIP
+{q:"Which emerging approach to leadership focuses on adaptability across cultures?",o:["A. Ethical Leadership","B. Strategic Leadership","C. Political Leadership","D. Cross-Cultural Leadership"],a:["D"]},
+{q:"The more a manager uses coercive power, the more likely he is to encourage",o:["A. sympathy.","B. good will.","C. resentment.","D. tolerance."],a:["C"]},
+{q:"Demonstrating personal excitement or passion about something is part of ____ leadership.",o:["A. Charismatic","B. Entrepreneurial","C. Symbolic","D. Integrative","E. Participative"],a:["A"]},
+{q:"As a property, leadership can be best defined as",o:["A. the practice of empowering employees to participate in organizational decision making.","B. a set of beliefs that supports the practice of interpersonal risk taking in teams.","C. the ability to shape employee behavior without using force.","D. a set of characteristics found in people who can influence the behavior of others."],a:["D"]},
+{q:"As a process, leadership can be defined as",o:["A. the practice of empowering employees to participate in organizational decision making.","B. the set of characteristics attributed to individuals who are perceived to be leaders.","C. the use of noncoercive influence to shape an organization's goals.","D. the ability to assess business process performance."],a:["C"]},
+{q:"What is a key characteristic of transformational leaders?",o:["A. Relying heavily on positional authority","B. Transmitting a sense of mission, stimulating learning experiences, and inspiring new ways of thinking","C. Maintaining the status quo within the organization","D. Prioritizing short-term results"],a:["B"]},
+{q:"The first organized approach to studying leadership focused on",o:["A. leadership behavior.","B. leadership traits.","C. rewards expected.","D. situational favorableness."],a:["B"]},
+{q:"According to Fiedler, a task is structured when it is:",o:["A. routine, difficult to understand, and unambiguous.","B. routine, easy to understand, and ambiguous.","C. irregular, difficult to understand, and ambiguous.","D. routine, easy to understand, and unambiguous."],a:["D"]},
+{q:"According to the Path-Goal Theory, which behavior is most likely to be used by a leader when the group becomes familiar with the task and as new problems are encountered?",o:["A. Directive Behavior","B. Supportive Behavior","C. Participative Behavior","D. Achievement-Oriented Behavior"],a:["C"]},
+{q:"In the context of the Ohio state studies of leadership, a leader showing consideration behavior",o:["A. attempts to establish a warm, friendly, and supportive climate at the workplace.","B. clearly defines the leader-subordinate role so that everyone knows what is expected of them.","C. establishes formal lines of communication, and determines how tasks will be performed.","D. is primarily interested in the performance of the employees."],a:["A"]},
+{q:"What is the basic assumption of situational approaches to leadership?",o:["A. Increasing worker job satisfaction through considerate leadership will get the best results.","B. Initiating structure for employees so they know exactly what needs to be done will be most effective.","C. The appropriate leader style will vary from one set of circumstances to another.","D. Effective leaders can be identified by certain traits."],a:["C"]},
+{q:"An individual who is motivating and inspiring people to energize them to overcome barriers by satisfying basic human needs is fulfilling what role and activity?",o:["A. Management role in developing a human network","B. Leadership role in developing a human network","C. Management role in executing plans","D. Leadership role in executing plans"],a:["B"]},
+{q:"______ is the ability to affect the behavior of others.",o:["A. Power","B. Discipline","C. Function","D. Potential"],a:["A"]},
+{q:"When leaders decide to either give salary increases to their employees or withhold any salary increases, which of the following types of power do they exercise?",o:["A. Coercive","B. Reward","C. Informal","D. Expert","E. Referent"],a:["B"]},
+{q:"A news producer has the authority to choose which reporter will get to cover important news items. The news producer uses this authority to recognize the hard work of reporters. Which of the following types of power is the producer using?",o:["A. Referent","B. Reward","C. Legitimate","D. Coercive"],a:["B"]},
+{q:"Which of the following is a defining characteristic of strategic leaders?",o:["A. They possess interpersonal attraction that inspires support and acceptance.","B. They understand the organization and recognize its superior alignment with the environment.","C. They transmit a sense of mission, stimulate learning experiences, and inspire new ways of thinking.","D. They understand international differences and diversity-based differences within one culture."],a:["B"]},
+{q:"Which of the following is a situational leadership model?",o:["A. Trait approach","B. Ohio State studies","C. Michigan studies","D. Path-goal theory","E. Leadership Grid"],a:["D"]},
+{q:"One of the reasons Steve Jobs was very successful at Apple was his charisma. From this observation, we can infer that he had ___ power.",o:["A. Referent","B. Reward","C. Legitimate","D. Coercive"],a:["A"]},
+{q:"Which of the following is a Theory Y assumption?",o:["A. Social processes do not influence the performance of workers.","B. People are not internally motivated to achieve their goals.","C. People do not naturally dislike work.","D. People perform better when they are threatened by the manager."],a:["C"]},
+{q:"Which of the following is the most probable motive for a manager to engage in political behavior?",o:["A. To avoid covert activities","B. To acquire power","C. To promote clear communication","D. To promote transparency"],a:["B"]},
+{q:"Vernique, a manager, consults with her subordinates and encourages their involvement in the decision making process. Based on the path-goal theory, what kind of leader behavior is Vernique exhibiting?",o:["A. Job-oriented","B. Employee-centered","C. Achievement-oriented","D. Participative"],a:["D"]},
+{q:"Why has the importance of cross-cultural leadership increased in today's times?",o:["A. Because of improving profit margins","B. Because of office politics","C. Because of increasing unethical practices","D. Because of the improving diversity ratios in workplaces"],a:["D"]},
+{q:"Which of the following is an example of a good leader in the context of business?",o:["A. A person who relies on force to lead people","B. A person who disobeys authority","C. A person who is efficient and does not delegate his or her duties","D. A person who can influence others"],a:["D"]},
+
+// MANAGEMENT FUNDAMENTALS
+{q:"______ can be defined as a set of activities directed at an organization's resources, with the aim of achieving organizational goals in an efficient and effective manner.",o:["A. Economics","B. A theory","C. Management","D. Self-dealing"],a:["C"]},
+{q:"Determining how a company's activities and resources are to be grouped is called",o:["A. leading.","B. controlling.","C. divesting.","D. planning.","E. Organizing."],a:["E"]},
+{q:"The management at Loft Corp. has introduced new employment policies. The managers are now tracking and monitoring the implementation of the new policies. Which of the following management functions is illustrated?",o:["A. Decision making","B. Controlling","C. Organizing","D. Leading"],a:["B"]},
+{q:"A management process is considered to be effective when:",o:["A. overhead production costs are increased.","B. the right decisions are made and implemented.","C. decisions are made independently of the organization's external environment.","D. the same amount of resources is allocated to all the functions of the organization."],a:["B"]},
+{q:"Which of the following helps make the management process efficient?",o:["A. Increasing overhead production costs","B. Using resources in a cost-effective manner","C. Using micromanagement techniques","D. Using the majority of resources for sales promotion activities"],a:["B"]},
+{q:"Scientific management focuses on",o:["A. improving the performance of individual workers.","B. increasing employee turnover.","C. analyzing the external rather than the internal environment of an organization.","D. encouraging soldiering among employees.","E. increasing overhead costs."],a:["A"]},
+{q:"Which of the following statements about administrative management is true?",o:["A. It deals with the jobs of individual employees.","B. It was first introduced by Frank and Lillian Gilbreth.","C. It focuses solely on combating soldiering.","D. It encompasses the concepts of planning, organizing, leading, and controlling."],a:["D"]},
+{q:"Which of the following statements about first-line managers is true?",o:["A. They are primarily responsible for implementing policies made by top managers.","B. They are typically involved in creating overall organizational strategies and goals.","C. They officially represent their organization to the external environment.","D. They typically spend a large proportion of their time supervising the work of their subordinates.","E. They make decisions about activities such as acquiring other companies and entering or abandoning various markets."],a:["D"]},
+{q:"Which of the following is the role of top managers in an organization?",o:["A. Overseeing day-to-day operations","B. Performing routine administrative tasks","C. Implementing plans of first-line managers","D. Creating organizational goals and overall strategy","E. Coordinating the work of first-line managers"],a:["D"]},
+{q:"When a manager answers a subordinate's question regarding the process of creating a report from raw data, he is relying on his ______ skills.",o:["A. abstract","B. technical","C. time management","D. decision-making","E. interpersonal"],a:["B"]},
+{q:"When a manager writes an email to his employees that provides details about the upcoming annual company picnic, he is most likely to be using his ____ skills.",o:["A. communication","B. technical","C. conceptual","D. interpersonal"],a:["A"]},
+{q:"skills refer to the abilities of managers to think in the abstract.",o:["A. Time management","B. Technical","C. Conceptual","D. Interpersonal"],a:["C"]},
+{q:"______ skills refer to a manager's ability to prioritize work, to work efficiently, and to delegate work appropriately.",o:["A. Time management","B. Technical","C. Conceptual","D. Interpersonal","E. Communication"],a:["A"]},
+{q:"Which of the following would be included in the management function of planning?",o:["A. Selecting the course of action most likely to lead to success","B. Monitoring progress toward the achievement of goals","C. Motivating others to higher levels of achievement","D. Communicating company policies to subordinates","E. Organizing people and resources"],a:["A"]},
+{q:"Which of the following statements about the contingency perspective is true?",o:["A. It is a part of the classical perspective of management.","B. It states that effective managerial behavior in one situation cannot always be generalized to other situations.","C. It states that all employees tend to perform better when they are promised higher incentives.","D. It states that the behavior of employees at work is not influenced by social processes."],a:["B"]},
+{q:"Which of the following is a financial resource that flows into an organization?",o:["A. Shareholder investments","B. Working capital","C. Retained earnings","D. Employee salaries"],a:["A"]},
+
+// CONTROL
+{q:"What is the first step in the control process?",o:["A. Measure performance","B. Establish standards","C. Compare performance to standards","D. Take corrective action"],a:["B"]},
+{q:"Organizations that use the bureaucratic control are characterized by:",o:["A. flat structures.","B. rewards focused on group performance.","C. limited employee participation.","D. heavy reliance on group norms."],a:["C"]},
+{q:"A publishing firm will use a(n) ______ budget to forecast and plan the demand for young adult books in Southeast Asia in the coming year.",o:["A. Labor","B. capital expenditures","C. Operating","D. balance sheet"],a:["C"]},
+{q:"The ______ budget shows the anticipated differences between sales or revenue and expenses.",o:["A. expense","B. profit","C. labor","D. capital expenditure"],a:["B"]},
+{q:"Quality control is a type of ______ control.",o:["A. Operations","B. Physical","C. Human","D. Information","E. Financial"],a:["A"]},
+{q:"DayCor has a detailed performance appraisal system. Employees must meet minimally acceptable levels of performance and are rewarded based upon their individual performance. DayCor most likely uses ____ control.",o:["A. Strategic","B. Decentralized","C. Bureaucratic","D. Organic"],a:["C"]},
+{q:"Quality control is a type of ______ control.",o:["A. Operations","B. Physical","C. Human","D. Information","E. Financial"],a:["A"]},
+{q:"Which of the following types of operations control relies heavily on feedback processes?",o:["A. Strategic control","B. Financial control","C. Preliminary control","D. Screening control"],a:["D"]},
+{q:"______ control attempts to monitor the quality or quantity of resources before they enter an organization.",o:["A. Structural","B. Post-action","C. Preliminary","D. Screening"],a:["C"]},
+{q:"In organizations, sales forecasting, economic forecasting, and environmental analysis are examples of the control of _____ resources.",o:["A. physical","B. human","C. information","D. financial","E. inventory"],a:["C"]},
+{q:"An organization shifts its budget from a few, large projects to accommodate a number of smaller projects every year. It also decentralizes power and gives additional responsibilities to individual project managers. This is an example of the use of ______ control.",o:["A. Structural","B. Human","C. Information","D. Financial"],a:["A"]},
+
+// DECISION MAKING
+{q:"R&D at Venus Electronics Inc. has created an innovative new device. Management now needs to decide if Venus should launch this device as its next new product. This is an example of a(n) ______ decision.",o:["A. Frequent","B. Nonprogrammed","C. Structured","D. Operational","E. Programmed"],a:["B"]},
+{q:"A(n) ______ decision is a decision that is relatively structured or recurs with some frequency (or both).",o:["A. custom-made","B. novel","C. unstructured","D. intuitive","E. programmed"],a:["E"]},
+{q:"______ is a commitment to finding and using the best theory and data available at the time to make a decision.",o:["A. Rational decision making","B. Classical decision making","C. Rational management","D. Evidence-based management"],a:["D"]},
+{q:"In decision making, a condition of ______ exists when a decision maker knows what the alternatives are and what conditions are associated with each alternative.",o:["A. Risk","B. Uncertainty","C. Certainty","D. Ambivalence","E. Imperfect information"],a:["C"]},
+{q:"Which of the following statements is true in the context of decision making under a state of risk?",o:["A. The decision maker clearly knows the alternatives.","B. The decision maker uses probability estimates to assess alternatives.","C. The decision maker is least likely to choose a bad alternative.","D. The decision maker has an accurate understanding of payoffs of all the alternatives.","E. The decision maker seldom considers his or her past experience while making the decision."],a:["B"]},
+{q:"Which of the following statements is true in the context of decision making under a condition of uncertainty?",o:["A. A decision maker greatly relies on intuition, judgment, and experience.","B. A decision maker clearly knows all the risks associated with alternatives to a problem.","C. A decision maker puts in least effort and uses a pre-determined structure for decision making.","D. A decision maker is able to estimate the payoffs and risks associated with alternatives."],a:["A"]},
+{q:"One advantage of group decision making is:",o:["A. groupthink.","B. saved time.","C. more acceptance of the final decision.","D. lowered cost of decision making."],a:["C"]},
+{q:"The classical decision model is a prescriptive approach, meaning that it",o:["A. provides managers with alternatives.","B. tells managers how they should make decisions.","C. assumes all decisions are made subjectively.","D. allows no room for flexibility."],a:["B"]},
+{q:"In the rational decision-making model, once the alternatives have been evaluated, the next step is to",o:["A. select the best alternative.","B. implement the chosen alternative.","C. evaluate the results of the chosen alternative.","D. identify the available alternatives."],a:["A"]},
+{q:"In which step of the rational decision-making model does the decision maker test the feasibility and satisfactoriness of alternatives before choosing one?",o:["A. Identifying alternatives","B. Implementing the chosen alternative","C. Defining the situation","D. Following up the implementation","E. Evaluating alternatives"],a:["E"]},
+{q:"In general, while identifying alternatives, the more important the decision,",o:["A. the more alternatives should be generated.","B. the less the chances of managers making the right decision.","C. the less the time needed to make the decision.","D. the more the tendency of managers to ignore intuitions."],a:["A"]},
+{q:"Ryan, the production manager at the Tan Shoes Company, chose the cheapest leather-cutting machine from a set of five machines. Ryan was engaged in",o:["A. decision making.","B. optimizing.","C. rationalizing.","D. brainstorming.","E. social loafing."],a:["B"]},
+{q:"Decisions made by top managers involving strategy, such as signing mergers or making acquisitions, are examples of _____ decisions.",o:["A. Frequent","B. Nonprogrammed","C. Structured","D. Operational","E. Programmed"],a:["B"]},
+{q:"EBN suggests treating the organization as an unfinished prototype, which means what?",o:["A. Face the hard facts.","B. Encourage experimentation and learning by doing.","C. Build a culture in which people tell the truth.","D. Get the best evidence and use it to guide actions.","E. Avoid decisions based on untested beliefs."],a:["B"]},
+{q:"______ involves selecting a course of action from a set of alternatives.",o:["A. Divesting","B. Controlling","C. Leading","D. Decision making","E. Organizing"],a:["D"]},
+
+// HUMAN RESOURCES
+{q:"Tests of ability, skill, aptitude, or knowledge that is relevant to the particular job",o:["A. are occasionally useful.","B. are usually the best predictors of job success.","C. are not as valuable as tests of general intelligence.","D. are not as useful as personality tests."],a:["B"]},
+{q:"In the business world, the term ______ is generally used to refer to demographic differences among people—differences in gender, age, ethnicity, and so forth.",o:["A. homogeneity","B. Synergy","C. Diversity","D. Divestiture"],a:["C"]},
+{q:"Ken is a newly hired police officer. He has been asked to spend a workday with a more experienced officer to learn about paperwork, how to handle accident scenes, how to interact with people, and other duties that he will be expected to perform. Which of the following concepts is illustrated?",o:["A. Performance appraisal","B. The assessment center method","C. Training manuals","D. On-the-job training","E. The lecture method"],a:["D"]},
+{q:"Pat saw an advertisement for a job opening. She went to the company's website to look at the job description in order to find out the",o:["A. skills of existing employees.","B. tools, materials, and equipment she would have to use to perform the job.","C. educational background required of applicants.","D. personal profile of a supervisor."],a:["B"]},
+{q:"The ______ lists the duties of a job, the job's working conditions, and the tools, materials, and equipment used to perform it.",o:["A. job specification","B. job description","C. replacement chart","D. statement of qualification"],a:["B"]},
+{q:"A performance appraisal system in which managers are evaluated by everyone around them—their boss, their peers, and their subordinates is known as ______.",o:["A. employment at will","B. 360-degree feedback","C. source monitoring","D. job evaluation"],a:["B"]},
+{q:"A company uses a series of simulated managerial tasks, including presentations and in-basket exercises, to evaluate candidates for promotion. This selection method is known as:",o:["A. Structured Interviewing","B. Cognitive Ability Testing","C. Assessment Center","D. Job Analysis"],a:["C"]},
+{q:"During an interview for a managerial position, the interviewer asks each candidate the same set of predetermined questions in the same order, using a standardized scoring rubric. What type of interview technique is being used?",o:["A. Unstructured Interview; it allows for a more natural conversation.","B. Panel Interview; it provides multiple perspectives on the candidate.","C. Structured Interview; it increases consistency and reduces interviewer bias.","D. Behavioral Interview; it focuses on past experiences to predict future behavior."],a:["C"]},
+{q:"______ is an ideal method for training employees in group decision making.",o:["A. Vestibule training","B. Programmed learning","C. Role-playing","D. The lecture method"],a:["C"]},
+{q:"______ is a systematized procedure for collecting and recording information about jobs within an organization.",o:["A. Job analysis","B. Job evaluation","C. Job specialization","D. Job enrichment"],a:["A"]},
+{q:"A(n) ______ lists each important managerial position in an organization, who occupies it, how long he or she will probably remain in the position, and who is or will be a qualified fill-in.",o:["A. skills inventory","B. employee information system","C. enterprise resource planning system","D. replacement chart"],a:["D"]},
+{q:"Which of the following is the first step in human resource planning?",o:["A. Assessing external and internal trends","B. Predicting demand","C. Forecasting supply","D. Comparing future demand and internal supply"],a:["A"]},
+{q:"Sara is an efficient supervisor at a restaurant. She was recently sent to a two-week educational course by her employer to help her get the skills she needs for promotion to a higher management post. The human resource management concept illustrated is",o:["A. staffing.","B. job rotation.","C. development.","D. training."],a:["C"]},
+{q:"In human resource management, ______ usually refers to teaching operational or technical employees how to do the job for which they were hired.",o:["A. job rotation","B. Development","C. Training","D. Deskilling"],a:["C"]},
+{q:"A(n) ______ is usually computerized and contains information on each employee's education, work experience, and career aspirations.",o:["A. bona fide occupational qualification","B. skills inventory","C. statement of qualification","D. job description"],a:["B"]},
+{q:"A coffee shop refuses to employ servers over 45 years old. This illustrates",o:["A. confirmatory bias.","B. affirmative action.","C. a direct form of discrimination.","D. equal employment opportunity."],a:["C"]},
+{q:"Organizations that manage diversity effectively often have",o:["A. lower levels of productivity and turnover.","B. higher levels of productivity and turnover.","C. lower levels of turnover and absenteeism.","D. higher levels of turnover and absenteeism.","E. higher levels of productivity and absenteeism."],a:["C"]},
+{q:"Top managers at Phoenix Inc. are all computer engineers and are highly regarded by other companies. The managers are examples of",o:["A. temporary workers.","B. emergent workers.","C. contingent employees.","D. knowledge workers."],a:["D"]},
+{q:"are hired for short periods of time and provide greater flexibility, earn lower wages, and often do not participate in benefits programs.",o:["A. Temporary workers","B. Regulatory agencies","C. Interest groups","D. Strategic allies"],a:["A"]},
+{q:"reflects an organization's investment in attracting, retaining, and motivating an effective workforce.",o:["A. Financial capital","B. Human capital","C. Surplus capital","D. Enterprise capital"],a:["B"]},
+{q:"Consumer tastes and preferences are ______ forces that influence an organization's product line.",o:["A. Technical","B. Internal","C. Managerial","D. External"],a:["D"]},
+];
+
+// =================== STATE ===================
+let questions=[],ci=0,sel=[],answered=false,score=0,wc=0,sc=0,hist=[],chosenN=10;
+
+document.getElementById('bankInfo').textContent = `📚 Ngân hàng: ${Q.length} câu hỏi`;
+
+document.getElementById('modeGrid').addEventListener('click', e => {
+  const c = e.target.closest('.mode-card');
+  if (!c) return;
+  soundClick();
+  document.querySelectorAll('.mode-card').forEach(x => x.classList.remove('active'));
+  c.classList.add('active');
+  chosenN = parseInt(c.dataset.n);
+});
+
+document.getElementById('startBtn').addEventListener('click', e => {
+  addRipple(e.currentTarget, e);
+  soundStart();
+  const shuffled = [...Q].sort(() => Math.random() - 0.5);
+  questions = chosenN === 0 ? shuffled : shuffled.slice(0, Math.min(chosenN, shuffled.length));
+  document.getElementById('welcome').classList.add('hide');
+  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('sTotal').textContent = questions.length;
+  ci = 0; score = 0; wc = 0; sc = 0; hist = [];
+  loadQ();
+});
+
+function loadQ() {
+  const q = questions[ci];
+  answered = false; sel = [];
+  const card = document.getElementById('qCard');
+  card.style.animation = 'none'; card.offsetHeight;
+  card.style.animation = 'cardIn 0.4s cubic-bezier(0.16,1,0.3,1) both';
+
+  document.getElementById('qNum').textContent = `QUESTION ${String(ci+1).padStart(2,'0')} / ${questions.length}`;
+  document.getElementById('qText').textContent = q.q;
+  const multi = q.m || q.a.length > 1;
+  document.getElementById('mBadge').innerHTML = multi ? '<span class="multi-badge">✦ Chọn nhiều đáp án</span>' : '';
+
+  const container = document.getElementById('opts');
+  container.innerHTML = '';
+  q.o.forEach(opt => {
+    const letter = opt.charAt(0), text = opt.slice(3);
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-letter">${letter}</span><span class="opt-text">${text}</span><span class="opt-icon"></span>`;
+    btn.addEventListener('click', ev => {
+      addRipple(btn, ev);
+      pickOpt(btn, letter, multi);
+    });
+    container.appendChild(btn);
+  });
+
+  document.getElementById('expl').className = 'expl';
+  document.getElementById('sCur').textContent = ci + 1;
+  document.getElementById('sOk').textContent = score;
+  document.getElementById('sWr').textContent = wc;
+
+  const pct = Math.round(ci / questions.length * 100);
+  document.getElementById('pFill').style.width = pct + '%';
+  document.getElementById('pLbl').textContent = `Câu ${ci+1} / ${questions.length}`;
+  document.getElementById('pPct').textContent = pct + '%';
+
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitBtn').style.display = 'flex';
+  document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('skipBtn').style.display = 'flex';
+}
+
+function pickOpt(btn, letter, multi) {
+  if (answered) return;
+  soundSelect();
+  if (!multi) {
+    document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+    sel = [letter]; btn.classList.add('selected');
+  } else {
+    const i = sel.indexOf(letter);
+    if (i > -1) { sel.splice(i, 1); btn.classList.remove('selected'); }
+    else { sel.push(letter); btn.classList.add('selected'); }
+  }
+  document.getElementById('submitBtn').disabled = sel.length === 0;
+}
+
+document.getElementById('submitBtn').addEventListener('click', ev => {
+  if (answered || sel.length === 0) return;
+  addRipple(ev.currentTarget, ev);
+  soundSubmit();
+  answered = true;
+  const q = questions[ci];
+  const correct = q.a.slice().sort().join('') === sel.slice().sort().join('');
+  if (correct) score++; else wc++;
+  hist.push({ q, selected: [...sel], correct });
+
+  setTimeout(() => {
+    if (correct) { soundCorrect(); document.getElementById('qCard').classList.add('correct-pulse'); setTimeout(() => document.getElementById('qCard').classList.remove('correct-pulse'), 600); }
+    else { soundWrong(); document.getElementById('qCard').classList.add('shake'); setTimeout(() => document.getElementById('qCard').classList.remove('shake'), 400); }
+  }, 100);
+
+  document.querySelectorAll('.opt-btn').forEach(btn => {
+    const letter = btn.querySelector('.opt-letter').textContent;
+    const isC = q.a.includes(letter), isSel = sel.includes(letter);
+    btn.disabled = true;
+    if (isSel && isC) { btn.classList.add('correct'); btn.querySelector('.opt-icon').textContent = '✓'; }
+    else if (isSel && !isC) { btn.classList.add('wrong'); btn.querySelector('.opt-icon').textContent = '✗'; }
+    else if (!isSel && isC) { btn.classList.add('show-correct'); btn.querySelector('.opt-icon').textContent = '✓'; }
+  });
+
+  if (q.x) {
+    const el = document.getElementById('expl');
+    el.textContent = '💡 ' + q.x;
+    el.classList.add('show');
+  }
+
+  document.getElementById('sOk').textContent = score;
+  document.getElementById('sWr').textContent = wc;
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('skipBtn').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'flex';
+  document.getElementById('nextBtn').textContent = ci < questions.length - 1 ? 'Tiếp theo →' : 'Xem kết quả 🎯';
+  document.getElementById('nextBtn').classList.add('bounce');
+  setTimeout(() => document.getElementById('nextBtn').classList.remove('bounce'), 350);
+});
+
+document.getElementById('skipBtn').addEventListener('click', ev => {
+  addRipple(ev.currentTarget, ev);
+  soundSkip();
+  sc++;
+  hist.push({ q: questions[ci], selected: [], correct: false, skipped: true });
+  go();
+});
+
+document.getElementById('nextBtn').addEventListener('click', ev => {
+  soundClick();
+  go();
+});
+
+function go() { ci++; if (ci >= questions.length) showResult(); else loadQ(); }
+
+function showResult() {
+  document.getElementById('quiz').style.display = 'none';
+  const res = document.getElementById('result');
+  res.classList.add('show');
+  const total = questions.length, pct = Math.round(score / total * 100);
+  document.getElementById('rPct').textContent = pct + '%';
+  document.getElementById('rSub').textContent = `${score} / ${total} câu trả lời đúng`;
+  document.getElementById('rOk').textContent = score;
+  document.getElementById('rWr').textContent = wc;
+  document.getElementById('rSk').textContent = sc;
+
+  let emoji, rank, bg, color;
+  if (pct >= 90) { emoji='🏆'; rank='XUẤT SẮC'; bg='linear-gradient(135deg,#d4a833,#b8862a)'; color='#fff'; }
+  else if (pct >= 75) { emoji='🎉'; rank='GIỎI'; bg='linear-gradient(135deg,#6b8c6e,#4a6b4d)'; color='#fff'; }
+  else if (pct >= 60) { emoji='👍'; rank='KHÁ'; bg='linear-gradient(135deg,#3d7cb5,#2a5a8c)'; color='#fff'; }
+  else if (pct >= 40) { emoji='📚'; rank='TRUNG BÌNH'; bg='linear-gradient(135deg,#c4522a,#9e3d1c)'; color='#fff'; }
+  else { emoji='💪'; rank='CẦN CỐ GẮNG'; bg='linear-gradient(135deg,#7a5c4a,#5a3d2b)'; color='#fff'; }
+
+  document.getElementById('rEmoji').textContent = emoji;
+  const rt = document.getElementById('rTag');
+  rt.textContent = rank; rt.style.background = bg; rt.style.color = color;
+
+  setTimeout(soundComplete, 200);
+}
+
+document.getElementById('revBtn').addEventListener('click', ev => {
+  soundClick();
+  const sec = document.getElementById('revSection'), list = document.getElementById('revList');
+  if (sec.style.display === 'block') { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  list.innerHTML = '';
+  hist.forEach((h, i) => {
+    const div = document.createElement('div');
+    div.className = `rev-item ${h.correct ? 'ok' : 'ng'}`;
+    const qt = h.q.q.length > 110 ? h.q.q.slice(0, 110) + '…' : h.q.q;
+    let html = '';
+    if (h.skipped) { html = '<span class="ans-tag wrong">Bỏ qua</span>'; }
+    else {
+      h.selected.forEach(s => { html += `<span class="ans-tag ${h.q.a.includes(s) ? 'right' : 'wrong'}">Chọn: ${s}</span>`; });
+      if (!h.correct) h.q.a.forEach(a => { if (!h.selected.includes(a)) html += `<span class="ans-tag correct">Đúng: ${a}</span>`; });
+    }
+    div.innerHTML = `<div class="rev-q"><span class="rev-n">Q${i+1}</span><span>${qt}</span></div><div class="rev-ans">${html}</div>`;
+    list.appendChild(div);
+  });
+});
+
+document.getElementById('restartBtn').addEventListener('click', ev => {
+  addRipple(ev.currentTarget, ev);
+  soundStart();
+  ci = 0; score = 0; wc = 0; sc = 0; hist = []; questions = [];
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('revSection').style.display = 'none';
+  document.getElementById('welcome').classList.remove('hide');
+});
+</script>
+</body>
+</html>
