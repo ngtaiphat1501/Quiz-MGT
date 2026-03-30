@@ -497,6 +497,84 @@ body::after {
 
 .sound-toggle:hover { border-color: var(--rust); transform: scale(1.05); }
 
+/* Timer */
+.timer-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.timer-ring {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+.timer-ring svg {
+  transform: rotate(-90deg);
+  width: 52px;
+  height: 52px;
+}
+
+.timer-ring circle {
+  fill: none;
+  stroke-width: 3.5;
+}
+
+.timer-ring .track { stroke: var(--mist); }
+.timer-ring .fill {
+  stroke: var(--rust);
+  stroke-linecap: round;
+  stroke-dasharray: 138.23; /* 2*PI*22 */
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s;
+}
+
+.timer-ring .fill.warn { stroke: var(--gold); }
+.timer-ring .fill.danger { stroke: #e03a1e; }
+
+.timer-num {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.timer-num.warn { color: var(--gold); }
+.timer-num.danger { color: #e03a1e; }
+
+.timer-bar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--mist);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.timer-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rust), var(--gold));
+  border-radius: 4px;
+  transition: width 1s linear, background 0.3s;
+}
+
+.timer-bar-fill.warn { background: linear-gradient(90deg, var(--gold), #e8b84b); }
+.timer-bar-fill.danger { background: linear-gradient(90deg, #e03a1e, var(--rust)); }
+
+@keyframes timerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.timer-num.pulse { animation: timerPulse 0.5s ease infinite; }
+
 /* Ripple effect */
 @keyframes ripple {
   0% { transform: scale(0); opacity: 0.4; }
@@ -574,6 +652,20 @@ body::after {
       <div class="progress-top"><span id="pLbl">Câu 1</span><span id="pPct">0%</span></div>
       <div class="progress-track"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
     </div>
+    <!-- Timer -->
+    <div class="timer-wrap" id="timerWrap">
+      <div class="timer-ring" id="timerRing">
+        <svg viewBox="0 0 52 52">
+          <circle class="track" cx="26" cy="26" r="22"/>
+          <circle class="fill" id="timerCircle" cx="26" cy="26" r="22"/>
+        </svg>
+        <div class="timer-num" id="timerNum">60</div>
+      </div>
+      <div class="timer-bar-track">
+        <div class="timer-bar-fill" id="timerBar" style="width:100%"></div>
+      </div>
+    </div>
+
     <div class="q-card" id="qCard">
       <div class="q-num" id="qNum">QUESTION 01</div>
       <div class="q-text" id="qText"></div>
@@ -2480,6 +2572,7 @@ const Q = [
 ];
 // =================== STATE ===================
 let questions=[],ci=0,sel=[],answered=false,score=0,wc=0,sc=0,hist=[],chosenN=10;
+let timerInterval=null, timerLeft=60, TIMER_MAX=60;
 
 document.getElementById('bankInfo').textContent = `📚 Ngân hàng: ${Q.length} câu hỏi`;
 
@@ -2503,6 +2596,86 @@ document.getElementById('startBtn').addEventListener('click', e => {
   ci = 0; score = 0; wc = 0; sc = 0; hist = [];
   loadQ();
 });
+
+// =================== TIMER ===================
+function startTimer() {
+  clearInterval(timerInterval);
+  timerLeft = TIMER_MAX;
+  updateTimerUI();
+  timerInterval = setInterval(() => {
+    timerLeft--;
+    updateTimerUI();
+    if (timerLeft <= 0) {
+      clearInterval(timerInterval);
+      timeOut();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+function updateTimerUI() {
+  const pct = timerLeft / TIMER_MAX;
+  const circumference = 2 * Math.PI * 22; // 138.23
+  const offset = circumference * (1 - pct);
+
+  const circle = document.getElementById('timerCircle');
+  const num = document.getElementById('timerNum');
+  const bar = document.getElementById('timerBar');
+
+  if (!circle) return;
+
+  circle.style.strokeDashoffset = offset;
+  num.textContent = timerLeft;
+  bar.style.width = (pct * 100) + '%';
+
+  // Color states
+  const isWarn = timerLeft <= 20 && timerLeft > 10;
+  const isDanger = timerLeft <= 10;
+
+  circle.className = 'fill' + (isDanger ? ' danger' : isWarn ? ' warn' : '');
+  num.className = 'timer-num' + (isDanger ? ' danger pulse' : isWarn ? ' warn' : '');
+  bar.className = 'timer-bar-fill' + (isDanger ? ' danger' : isWarn ? ' warn' : '');
+
+  // Tick sound on last 10s
+  if (isDanger && soundOn) {
+    playTone(880, 'sine', 0.04, 0.08);
+  }
+}
+
+function timeOut() {
+  if (answered) return;
+  answered = true;
+  wc++;
+  hist.push({ q: questions[ci], selected: [], correct: false, skipped: false, timeout: true });
+
+  // Shake & show correct answers
+  document.getElementById('qCard').classList.add('shake');
+  setTimeout(() => document.getElementById('qCard').classList.remove('shake'), 400);
+  soundWrong();
+
+  document.querySelectorAll('.opt-btn').forEach(btn => {
+    const letter = btn.querySelector('.opt-letter').textContent;
+    btn.disabled = true;
+    if (questions[ci].a.includes(letter)) {
+      btn.classList.add('show-correct');
+      btn.querySelector('.opt-icon').textContent = '✓';
+    }
+  });
+
+  document.getElementById('sWr').textContent = wc;
+  document.getElementById('submitBtn').style.display = 'none';
+  document.getElementById('skipBtn').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'flex';
+  document.getElementById('nextBtn').textContent = ci < questions.length - 1 ? 'Tiếp theo →' : 'Xem kết quả 🎯';
+
+  // Show timeout message
+  const el = document.getElementById('expl');
+  el.textContent = '⏰ Hết giờ! Đáp án đúng đã được hiển thị.';
+  el.classList.add('show');
+}
 
 function loadQ() {
   const q = questions[ci];
@@ -2544,6 +2717,7 @@ function loadQ() {
   document.getElementById('submitBtn').style.display = 'flex';
   document.getElementById('nextBtn').style.display = 'none';
   document.getElementById('skipBtn').style.display = 'flex';
+  startTimer();
 }
 
 function pickOpt(btn, letter, multi) {
@@ -2565,6 +2739,7 @@ document.getElementById('submitBtn').addEventListener('click', ev => {
   addRipple(ev.currentTarget, ev);
   soundSubmit();
   answered = true;
+  stopTimer();
   const q = questions[ci];
   const correct = q.a.slice().sort().join('') === sel.slice().sort().join('');
   if (correct) score++; else wc++;
@@ -2603,6 +2778,7 @@ document.getElementById('submitBtn').addEventListener('click', ev => {
 document.getElementById('skipBtn').addEventListener('click', ev => {
   addRipple(ev.currentTarget, ev);
   soundSkip();
+  stopTimer();
   sc++;
   hist.push({ q: questions[ci], selected: [], correct: false, skipped: true });
   go();
@@ -2616,6 +2792,7 @@ document.getElementById('nextBtn').addEventListener('click', ev => {
 function go() { ci++; if (ci >= questions.length) showResult(); else loadQ(); }
 
 function showResult() {
+  stopTimer();
   document.getElementById('quiz').style.display = 'none';
   const res = document.getElementById('result');
   res.classList.add('show');
@@ -2652,6 +2829,7 @@ document.getElementById('revBtn').addEventListener('click', ev => {
     const qt = h.q.q.length > 110 ? h.q.q.slice(0, 110) + '…' : h.q.q;
     let html = '';
     if (h.skipped) { html = '<span class="ans-tag wrong">Bỏ qua</span>'; }
+    else if (h.timeout) { html = '<span class="ans-tag wrong">⏰ Hết giờ</span>'; h.q.a.forEach(a => { html += `<span class="ans-tag correct">Đúng: ${a}</span>`; }); }
     else {
       h.selected.forEach(s => { html += `<span class="ans-tag ${h.q.a.includes(s) ? 'right' : 'wrong'}">Chọn: ${s}</span>`; });
       if (!h.correct) h.q.a.forEach(a => { if (!h.selected.includes(a)) html += `<span class="ans-tag correct">Đúng: ${a}</span>`; });
@@ -2664,6 +2842,7 @@ document.getElementById('revBtn').addEventListener('click', ev => {
 document.getElementById('restartBtn').addEventListener('click', ev => {
   addRipple(ev.currentTarget, ev);
   soundStart();
+  stopTimer();
   ci = 0; score = 0; wc = 0; sc = 0; hist = []; questions = [];
   document.getElementById('result').classList.remove('show');
   document.getElementById('revSection').style.display = 'none';
